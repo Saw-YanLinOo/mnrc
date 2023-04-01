@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'nrc_data.dart';
 
 class NrcWidget extends StatefulWidget {
-  final String? phone;
-  const NrcWidget({super.key, this.phone});
+  const NrcWidget({super.key});
   @override
-  _NrcWidgetState createState() => _NrcWidgetState();
+  State<NrcWidget> createState() => _NrcWidgetState();
 }
 
 class _NrcWidgetState extends State<NrcWidget> {
@@ -75,7 +74,7 @@ class _NrcWidgetState extends State<NrcWidget> {
               value: value,
               child: Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14,
                 ),
