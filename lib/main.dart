@@ -29,6 +29,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: 8,
           ),
-          NrcWidget(),
+          NrcWidget(controller: controller),
           SizedBox(
             height: 8,
           ),
