@@ -2,16 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'nrc_data.dart';
 
-enum MNRC {
-  ENG,
-  MM,
-}
-
 class NrcWidget extends StatefulWidget {
-  const NrcWidget({super.key, this.controller, this.mnrc});
-
-  final TextEditingController? controller;
-  final MNRC? mnrc;
+  const NrcWidget({super.key});
   @override
   State<NrcWidget> createState() => _NrcWidgetState();
 }
@@ -22,7 +14,7 @@ class _NrcWidgetState extends State<NrcWidget> {
   String? selectedNrcPostfix;
   String? regionHolder;
   String? nrcNo;
-  // String? passportNo;
+  String? passportNo;
   // ignore: unused_field
   bool _autoValidate = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -55,6 +47,44 @@ class _NrcWidgetState extends State<NrcWidget> {
   //     ),
   //   );
   // }
+
+  Widget _userNrcPrefix() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 4.0),
+      width: MediaQuery.of(context).size.width * 0.15,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4.0),
+        border: Border.all(
+          width: 0.5,
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: selectedNrcPrefix,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedRegion = null;
+              selectedNrcPrefix = newValue;
+            });
+          },
+          items:
+              NrcData.nrcPrefix.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
 
   Widget _userNrcRegion() {
     switch (selectedNrcPrefix) {
@@ -106,20 +136,10 @@ class _NrcWidgetState extends State<NrcWidget> {
     }
   }
 
-  Widget _nrc(List<String> list) {
-    return UserNrcPrefix(
-      nrcList: list,
-      onChanged: (p0) {
-        selectedRegion = p0;
-        setState(() {});
-      },
-    );
-  }
-
   Widget _nrcRegionDrop(List<String> listData) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.28,
-      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      padding: EdgeInsets.symmetric(horizontal: 6.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.0),
         border: Border.all(
@@ -143,7 +163,7 @@ class _NrcWidgetState extends State<NrcWidget> {
                 value,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
               ),
             );
@@ -155,7 +175,7 @@ class _NrcWidgetState extends State<NrcWidget> {
 
   Widget _userNrcPostfix() {
     return Container(
-      padding: EdgeInsets.only(left: 6.0),
+      padding: EdgeInsets.symmetric(horizontal: 6.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.0),
         border: Border.all(
@@ -176,7 +196,7 @@ class _NrcWidgetState extends State<NrcWidget> {
               value: value,
               child: Text(
                 value,
-                style: TextStyle(color: Colors.black, fontSize: 12),
+                style: TextStyle(color: Colors.black),
               ),
             );
           }).toList(),
@@ -193,6 +213,7 @@ class _NrcWidgetState extends State<NrcWidget> {
   //   //         selectedNrcPostfix != null) {
   //   //   _formKey.currentState?.save();
   //   //   print(widget.phone);
+
   //   //   Navigator.push(
   //   //       context,
   //   //       MaterialPageRoute(
@@ -215,22 +236,20 @@ class _NrcWidgetState extends State<NrcWidget> {
   Widget _flexTextForm(String name) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.23,
-      height: 70,
       child: TextFormField(
         style: TextStyle(color: Colors.black),
-        maxLength: 6,
         decoration: InputDecoration(
           labelText: name,
           errorStyle: TextStyle(fontSize: 12),
-          border: const OutlineInputBorder(
-              // borderRadius: BorderRadius.all(
-              //   Radius.circular(4.0),
-              // ),
-              // borderSide: BorderSide(
-              //   color: Colors.black,
-              //   width: 0.5,
-              // ),
-              ),
+          border: new OutlineInputBorder(
+            borderRadius: const BorderRadius.all(
+              const Radius.circular(4.0),
+            ),
+            borderSide: new BorderSide(
+              color: Colors.black,
+              width: 0.5,
+            ),
+          ),
         ),
         keyboardType: TextInputType.number,
         validator: (values) {
@@ -242,6 +261,7 @@ class _NrcWidgetState extends State<NrcWidget> {
           } else if (values?.length != 6) {
             return 'Invalid NRC No.';
           }
+
           return null;
         },
         onSaved: (values) {
@@ -308,164 +328,16 @@ class _NrcWidgetState extends State<NrcWidget> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
+      height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          UserNrcPrefix(
-              nrcList: NrcData.nrcPrefix,
-              onChanged: (prefix) {
-                selectedNrcPrefix = prefix;
-                setState(() {});
-              }),
-          UserNrcRegion(
-            selectedNrcPrefix: selectedNrcPrefix,
-            onChanged: (regin) {
-              selectedRegion = regin;
-              setState(() {});
-            },
-          ),
+          _userNrcPrefix(),
+          _userNrcRegion(),
           _userNrcPostfix(),
           _flexTextForm('No.'),
         ],
-      ),
-    );
-  }
-}
-
-class UserNrcRegion extends StatelessWidget {
-  const UserNrcRegion({super.key, this.selectedNrcPrefix, this.onChanged});
-
-  final String? selectedNrcPrefix;
-  final Function(String?)? onChanged;
-  @override
-  Widget build(BuildContext context) {
-    switch (selectedNrcPrefix) {
-      case '1/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionOne,
-          onChanged: onChanged,
-        );
-
-      case '2/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionTwo,
-          onChanged: onChanged,
-        );
-      case '3/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionThree,
-          onChanged: onChanged,
-        );
-      case '4/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionFour,
-          onChanged: onChanged,
-        );
-      case '5/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionFive,
-          onChanged: onChanged,
-        );
-      case '6/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionSix,
-          onChanged: onChanged,
-        );
-      case '7/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionSeven,
-          onChanged: onChanged,
-        );
-      case '8/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionEight,
-          onChanged: onChanged,
-        );
-      case '9/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionNine,
-          onChanged: onChanged,
-        );
-      case '10/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionTen,
-          onChanged: onChanged,
-        );
-      case '11/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionEleven,
-          onChanged: onChanged,
-        );
-      case '12/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionTwelve,
-          onChanged: onChanged,
-        );
-      case '13/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionThirdteen,
-          onChanged: onChanged,
-        );
-      case '14/':
-        return UserNrcPrefix(
-          nrcList: NrcData.regionFourteen,
-          onChanged: onChanged,
-        );
-
-      default:
-        return UserNrcPrefix(
-          nrcList: NrcData.regionOne,
-          onChanged: onChanged,
-        );
-    }
-  }
-}
-
-class UserNrcPrefix extends StatelessWidget {
-  const UserNrcPrefix({
-    super.key,
-    required this.nrcList,
-    this.selectedNrcPrefix,
-    this.onChanged,
-  });
-
-  final List<String> nrcList;
-  final String? selectedNrcPrefix;
-  final Function(String?)? onChanged;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.0),
-      width: MediaQuery.of(context).size.width * 0.15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4.0),
-        border: Border.all(
-          width: 0.5,
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: selectedNrcPrefix,
-          onChanged: (String? newValue) {
-            if (onChanged != null) {
-              onChanged!(newValue);
-            }
-          },
-          items: nrcList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                ),
-              ),
-            );
-          }).toList(),
-        ),
       ),
     );
   }
